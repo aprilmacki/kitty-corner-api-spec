@@ -147,6 +147,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetFeedResponse"
+              example:
+                posts:
+                  - postId: 15
+                    username: francis
+                    profileName: Francs
+                    profilePhoto: "IzpEw7XDoFLCjxDCrBHCi8OQCcOIw54xeMKNw4PCn1/DtMKTwoNV"
+                    body: "miaaaoo!"
+                    totalThumbsUp: 23
+                    totalThumbsDown: 0
+                    totalComments: 1
+                    timestampSeconds: 1740752040
+                  - postId: 14
+                    username: minathecat
+                    profileName: Mina
+                    profilePhoto: "IzpEw7XDoFLCjxDCrBHCi8OQCcOIw54xeMKNw4PCn1/DtMKTwoNV"
+                    body: "meow"
+                    totalThumbsUp: 102
+                    totalThumbsDown: 3
+                    totalComments: 3
+                    timestampSeconds: 1740773520
+                nextCursor: 13
 
 components:
   securitySchemes:
@@ -240,4 +261,5 @@ components:
         nextCursor:
           type: integer
           format: int64
+
 
