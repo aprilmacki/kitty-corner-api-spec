@@ -38,7 +38,7 @@ paths:
               pronouns: "she/her"
       responses:
         200:
-          description: "Sign up successful"
+          description: "Successful"
           content:
             application/json:
               schema:
@@ -63,7 +63,7 @@ paths:
               password: "8bsb3iiV8eew9aV"
       responses:
         200:
-          description: "Sign in successful"
+          description: "Successful"
           content:
             application/json:
               schema:
@@ -76,7 +76,7 @@ paths:
         - accessToken: []
       responses:
         204:
-          description: "Sign out successful"
+          description: "Successful"
 
   /auth/refresh:
     post:
@@ -85,7 +85,7 @@ paths:
         - refreshToken: []
       responses:
         200:
-          description: "Token refresh successful"
+          description: "Successful"
           content:
             application/json:
               schema:
@@ -142,11 +142,19 @@ paths:
             format: int64
       responses:
         200:
-          description: "Get posts successful"
+          description: "Successful"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetFeedResponse"
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  nextCursor:
+                    type: integer
+                    format: int64
               example:
                 posts:
                   - postId: 15
@@ -170,6 +178,184 @@ paths:
                     totalComments: 3
                     timestampSeconds: 1740773520
                 nextCursor: 13
+
+  /posts/{postId}:
+    get:
+      summary: "Get post"
+      security:
+        - accessToken: [ ]
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: "Successful"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+              example:
+                postId: 14
+                username: minathecat
+                profileName: Mina
+                profilePhoto: "IzpEw7XDoFLCjxDCrBHCi8OQCcOIw54xeMKNw4PCn1/DtMKTwoNV"
+                body: "meow"
+                distanceKm: 1.4
+                totalThumbsUp: 102
+                totalThumbsDown: 3
+                totalComments: 3
+                timestampSeconds: 1740773520
+
+  /posts/{postId}/comments:
+    get:
+      summary: "Get post comments"
+      security:
+        - accessToken: [ ]
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: "Successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  comments:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Comment"
+              example:
+                comments:
+                  - commentId: 1234
+                    username: minathecat
+                    body: "i for one actually hate my brother, francis"
+                    totalLikes: 2
+                    totalDislikes: 23
+                    createdAtEpochSeconds: 1741301877
+                  - commentId: 1235
+                    username: francis
+                    body: "hey that's mean!"
+                    totalLikes: 32
+                    totalDislikes: 1
+                    createdAtEpochSeconds: 1741301955
+    post:
+      summary: "Create a comment"
+      security:
+        - accessToken: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+
+  /posts/{postId}/comments/{commentId}:
+    delete:
+      summary: "Delete a comment"
+      security:
+        - accessToken: [ ]
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        204:
+          description: "Successful"
+    put:
+      summary: "Edit a comment"
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+
+  /posts/{postId}/reactions:
+    post:
+      summary: "Create a reaction"
+    delete:
+      summary: "Delete a reaction"
+
+  /users/{username}/profile:
+    get:
+      summary: "Get user profile"
+    responses:
+      200:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                name:
+                  type: string
+                photo:
+                  type: string
+                  contentEncoding: base64
+                  contentMediaType: image/png
+  /users/{username}/posts:
+    get:
+      summary: "Get users posts"
 
 components:
   securitySchemes:
@@ -223,48 +409,54 @@ components:
           description: |
             A JWT refresh token. The client may use this to fetch a new access and refresh token pair when the
             current access token expires. It may be used once, after which it becomes invalid.
-    GetFeedResponse:
+    Post:
       type: object
       properties:
-        posts:
-          type: array
-          items:
-            type: object
-            properties:
-              postId:
-                type: integer
-                format: int64
-              username:
-                type: string
-              profileName:
-                type: string
-              profilePhoto:
-                type: string
-                format: binary
-              body:
-                type: string
-                contentEncoding: base64
-                "contentMediaType": image/png
-              distanceKm:
-                type: number
-                format: decimal
-              totalThumbsUp:
-                type: integer
-                format: int64
-                minimum: 0
-              totalThumbsDown:
-                type: integer
-                format: int64
-                minimum: 0
-              totalComments:
-                type: integer
-                format: int64
-                minimum: 0
-              timestampSeconds:
-                type: integer
-                format: int64
-        nextCursor:
+        postId:
           type: integer
           format: int64
-
-
+        username:
+          type: string
+        body:
+          type: string
+        distanceKm:
+          type: number
+          format: decimal
+        totalLikes:
+          type: integer
+          format: int64
+          minimum: 0
+        totalDislikes:
+          type: integer
+          format: int64
+          minimum: 0
+        totalComments:
+          type: integer
+          format: int64
+          minimum: 0
+        createdAtEpochSeconds:
+          type: integer
+          format: int64
+    Comment:
+      type: object
+      properties:
+        commentId:
+          type: string
+        username:
+          type: string
+        body:
+          type: string
+        totalLikes:
+          type: integer
+          format: int64
+          minimum: 0
+        totalDislikes:
+          type: integer
+          format: int64
+          minimum: 0
+        createdAtEpochSeconds:
+          type: integer
+          format: int64
+        updatedAtEpochSeconds:
+          type: integer
+          format: int64
