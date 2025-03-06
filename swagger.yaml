@@ -1,0 +1,243 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: KittyCorner API
+  description: This is the KittyCorner API.
+servers:
+  - url: http://example.com/v1
+
+paths:
+  /auth/signup:
+    post:
+      summary: "Sign up for an account"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+                name:
+                  type: string
+                birthday:
+                  type: string
+                pronouns:
+                  type: string
+            example:
+              email: "aprilmack@posteo.net"
+              username: "aprilmack"
+              password: "8bsb3iiV8eew9aV"
+              name: "April"
+              birthday: "04/1997"
+              pronouns: "she/her"
+      responses:
+        200:
+          description: "Sign up successful"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+
+  /auth/signin:
+    post:
+      summary: "Sign in to your account"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+            example:
+              username: "aprilmack"
+              password: "8bsb3iiV8eew9aV"
+      responses:
+        200:
+          description: "Sign in successful"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+
+  /auth/signout:
+    post:
+      summary: "Sign out"
+      security:
+        - accessToken: []
+      responses:
+        204:
+          description: "Sign out successful"
+
+  /auth/refresh:
+    post:
+      summary: "Refresh tokens"
+      security:
+        - refreshToken: []
+      responses:
+        200:
+          description: "Token refresh successful"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+
+  /posts:
+    get:
+      summary: "Get posts"
+      security:
+        - accessToken: []
+      parameters:
+        - name: startAge
+          in: query
+          required: false
+          description: The inclusive start age.
+          schema:
+            type: integer
+            format: int64
+            minimum: 18
+            default: 18
+        - name: endAge
+          in: query
+          required: false
+          description: The inclusive end age. Must be greater than or equal to `startAge`. End age is infinite if omitted.
+          schema:
+            type: integer
+            format: int64
+            minimum: 18
+        - name: radius
+          in: query
+          required: false
+          description: The search radius in kilometers. Radius is infinite if omitted.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+        - name: limit
+          in: query
+          required: true
+          description: The max number of posts to return
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            maximum: 100
+        - name: cursor
+          in: query
+          required: false
+          description: | 
+            The first `limit` posts are returned sorted by newest first. Start at the post with ID `cursor`.
+            Note that post IDs are auto incrementing chronologically. Start at the newest post if omitted.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: "Get posts successful"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetFeedResponse"
+
+components:
+  securitySchemes:
+    accessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: The access token
+    refreshToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: The refresh token
+  schemas:
+    TokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: |
+            A JWT access token. The client should pass this as an authorization bearer header when making
+            subsequent API calls.
+          contentMediaType: application/jwt
+          contentSchema:
+            type: array
+            minItems: 2
+            prefixItems:
+              - type: object
+                properties:
+                  typ:
+                    type: string
+                    const: JWT
+                  alg:
+                    type: string
+                    const: HS256
+              - type: object
+                properties:
+                  sub:
+                    type: string
+                    description: The username
+                  exp:
+                    type: integer
+                    format: int64
+                    description: The expiration time in epoch seconds
+                  iat:
+                    type: integer
+                    format: int64
+                    description: The issue time in epoch seconds
+        refreshToken:
+          type: string
+          description: |
+            A JWT refresh token. The client may use this to fetch a new access and refresh token pair when the
+            current access token expires. It may be used once, after which it becomes invalid.
+    GetFeedResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            type: object
+            properties:
+              postId:
+                type: integer
+                format: int6
+              username:
+                type: string
+              profileName:
+                type: string
+              profilePhoto:
+                type: string
+                format: binary
+              body:
+                type: string
+                contentEncoding: base64
+                "contentMediaType": image/png
+              totalThumbsUp:
+                type: integer
+                format: int64
+                minimum: 0
+              totalThumbsDown:
+                type: integer
+                format: int64
+                minimum: 0
+              totalComments:
+                type: integer
+                format: int64
+                minimum: 0
+              timestampSeconds:
+                type: integer
+                format: int64
+        nextCursor:
+          type: integer
+          format: int64
+
