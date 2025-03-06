@@ -154,6 +154,7 @@ paths:
                     profileName: Francs
                     profilePhoto: "IzpEw7XDoFLCjxDCrBHCi8OQCcOIw54xeMKNw4PCn1/DtMKTwoNV"
                     body: "miaaaoo!"
+                    distanceKm: 0.2
                     totalThumbsUp: 23
                     totalThumbsDown: 0
                     totalComments: 1
@@ -163,6 +164,7 @@ paths:
                     profileName: Mina
                     profilePhoto: "IzpEw7XDoFLCjxDCrBHCi8OQCcOIw54xeMKNw4PCn1/DtMKTwoNV"
                     body: "meow"
+                    distanceKm: 1.4
                     totalThumbsUp: 102
                     totalThumbsDown: 3
                     totalComments: 3
@@ -231,7 +233,7 @@ components:
             properties:
               postId:
                 type: integer
-                format: int6
+                format: int64
               username:
                 type: string
               profileName:
@@ -243,6 +245,9 @@ components:
                 type: string
                 contentEncoding: base64
                 "contentMediaType": image/png
+              distanceKm:
+                type: number
+                format: decimal
               totalThumbsUp:
                 type: integer
                 format: int64
