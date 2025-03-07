@@ -6,10 +6,24 @@ info:
 servers:
   - url: http://example.com/v1
 
+tags:
+  - name: auth
+    description: Authorization Endpoints
+  - name: posts
+    description: Posts Endpoints
+  - name: users
+    description: Users Endpoints
+  - name: comments
+    description: Comments Endpoints
+  - name: settings
+    description: Settings Endpoints
+
 paths:
   /auth/signup:
     post:
       summary: "Sign up for an account"
+      tags:
+        - auth
       requestBody:
         required: true
         content:
@@ -47,6 +61,8 @@ paths:
   /auth/signin:
     post:
       summary: "Sign in to your account"
+      tags:
+        - auth
       requestBody:
         required: true
         content:
@@ -72,6 +88,8 @@ paths:
   /auth/signout:
     post:
       summary: "Sign out"
+      tags:
+        - auth
       security:
         - accessToken: []
       responses:
@@ -81,6 +99,8 @@ paths:
   /auth/refresh:
     post:
       summary: "Refresh tokens"
+      tags:
+        - auth
       security:
         - refreshToken: []
       responses:
@@ -94,6 +114,8 @@ paths:
   /posts:
     get:
       summary: "Get posts"
+      tags:
+        - posts
       security:
         - accessToken: []
       parameters:
@@ -159,29 +181,33 @@ paths:
                 posts:
                   - postId: 15
                     username: francis
-                    profileName: Francs
-                    profilePhoto: "IzpEw7XDoFLCjxDCrBHCi8OQCcOIw54xeMKNw4PCn1/DtMKTwoNV"
                     body: "miaaaoo!"
                     distanceKm: 0.2
                     totalThumbsUp: 23
                     totalThumbsDown: 0
                     totalComments: 1
-                    timestampSeconds: 1740752040
+                    createdAtEpochSeconds: 1740752040
+                    viewerReactions:
+                      - reactionId: 365
+                        type: "like"
                   - postId: 14
                     username: minathecat
-                    profileName: Mina
-                    profilePhoto: "IzpEw7XDoFLCjxDCrBHCi8OQCcOIw54xeMKNw4PCn1/DtMKTwoNV"
                     body: "meow"
                     distanceKm: 1.4
                     totalThumbsUp: 102
                     totalThumbsDown: 3
                     totalComments: 3
-                    timestampSeconds: 1740773520
+                    createdAtEpochSeconds: 1740773520
+                    viewerReactions:
+                      - reactionId: 369
+                        type: "dislike"
                 nextCursor: 13
 
   /posts/{postId}:
     get:
       summary: "Get post"
+      tags:
+        - posts
       security:
         - accessToken: [ ]
       parameters:
@@ -201,27 +227,28 @@ paths:
               example:
                 postId: 14
                 username: minathecat
-                profileName: Mina
-                profilePhoto: "IzpEw7XDoFLCjxDCrBHCi8OQCcOIw54xeMKNw4PCn1/DtMKTwoNV"
                 body: "meow"
                 distanceKm: 1.4
                 totalThumbsUp: 102
                 totalThumbsDown: 3
                 totalComments: 3
-                timestampSeconds: 1740773520
+                createdAtEpochSeconds: 1740773520
+                viewerReactions: []
 
   /posts/{postId}/comments:
+    parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
     get:
       summary: "Get post comments"
+      tags:
+        - comments
       security:
         - accessToken: [ ]
-      parameters:
-        - name: postId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
       responses:
         200:
           description: "Successful"
@@ -242,23 +269,24 @@ paths:
                     totalLikes: 2
                     totalDislikes: 23
                     createdAtEpochSeconds: 1741301877
+                    updatedAtEpochSeconds: 1741301877
+                    viewerReactions:
+                      - reactionId: 64
+                        type: "like"
                   - commentId: 1235
                     username: francis
                     body: "hey that's mean!"
                     totalLikes: 32
                     totalDislikes: 1
                     createdAtEpochSeconds: 1741301955
+                    updatedAtEpochSeconds: 1741302015
+                    viewerReactions: []
     post:
       summary: "Create a comment"
+      tags:
+        - comments
       security:
         - accessToken: []
-      parameters:
-        - name: postId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
       requestBody:
         required: true
         content:
@@ -268,17 +296,87 @@ paths:
               properties:
                 body:
                   type: string
+            example:
+              body: "meooow!"
       responses:
         200:
           description: "Success"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Post"
+                $ref: "#/components/schemas/Comment"
+              example:
+                commentId: 15
+                username: minathecat
+                body: "meooow!"
+                totalLikes: 12
+                totalDislikes: 0
+                createdAtEpochSeconds: 1741301877
+                updatedAtEpochSeconds: 1741301877
+                viewerReactions: []
 
   /posts/{postId}/comments/{commentId}:
+    parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
     delete:
       summary: "Delete a comment"
+      tags:
+        - comments
+      security:
+        - accessToken: [ ]
+      responses:
+        204:
+          description: "Successful"
+    put:
+      summary: "Edit a comment"
+      tags:
+        - comments
+      security:
+        - accessToken: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+            example:
+              body: "i've edited this existing comment"
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+              example:
+                commentId: 15
+                username: minathecat
+                body: "i've edited this existing comment"
+                totalLikes: 12
+                totalDislikes: 0
+                createdAtEpochSeconds: 1741301877
+                updatedAtEpochSeconds: 1741301997
+                viewerReactions: []
+
+  /posts/{postId}/comments/{commentId}/reactions:
+    post:
+      summary: "Create a comment reaction"
+      tags:
+        - comments
       security:
         - accessToken: [ ]
       parameters:
@@ -294,11 +392,46 @@ paths:
           schema:
             type: integer
             format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: [like, dislike]
+            example:
+              type: like
       responses:
-        204:
+        200:
           description: "Successful"
-    put:
-      summary: "Edit a comment"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum: [like, dislike]
+                  username:
+                    type: string
+                  reactionId:
+                    type: integer
+                    format: int64
+              example:
+                type: like
+                username: "minathecat"
+                reactionId: 175
+
+  /posts/{postId}/comments/{commentId}/reactions/{reactionId}:
+    delete:
+      summary: "Delete a comment reaction"
+      tags:
+        - comments
+      security:
+        - accessToken: [ ]
       parameters:
         - name: postId
           in: path
@@ -312,6 +445,23 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: reactionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        204:
+          description: "Successful"
+
+  /posts/{postId}/reactions:
+    post:
+      summary: "Create a reaction"
+      tags:
+        - posts
+      security:
+        - accessToken: []
       requestBody:
         required: true
         content:
@@ -319,43 +469,329 @@ paths:
             schema:
               type: object
               properties:
-                body:
+                type:
                   type: string
+                  enum: [like, dislike]
       responses:
         200:
-          description: "Success"
+          description: "Successful"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Post"
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum: [like, dislike]
+                  username:
+                    type: string
+                  reactionId:
+                    type: integer
+                    format: int64
+              example:
+                type: like
+                username: "minathecat"
+                reactionId: 175
 
-  /posts/{postId}/reactions:
-    post:
-      summary: "Create a reaction"
+  /posts/{postId}/reactions/{reactionId}:
     delete:
-      summary: "Delete a reaction"
+      summary: "Delete a post reaction"
+      tags:
+        - posts
+      security:
+        - accessToken: [ ]
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: reactionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        204:
+          description: "Successful"
 
   /users/{username}/profile:
     get:
       summary: "Get user profile"
-    responses:
-      200:
+      tags:
+        - users
+      security:
+        - accessToken: []
+      parameters:
+        - name: username
+          in: path
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  name:
+                    type: string
+                  pronouns:
+                    type: string
+                  location:
+                    type: string
+                  joinedAtEpochSeconds:
+                    type: integer
+                    format: int64
+                  totalPosts:
+                    type: integer
+                    format: int64
+              example:
+                username: "minathecat"
+                name: "Mina"
+                pronouns: "she/her"
+                location: "Chicago, IL"
+                joinedAtEpochSeconds: 1736971200
+                totalPosts: 20
+    put:
+      summary: "Update user profile"
+      tags:
+        - users
+      security:
+        - accessToken: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                username:
-                  type: string
                 name:
                   type: string
-                photo:
+                pronouns:
                   type: string
-                  contentEncoding: base64
-                  contentMediaType: image/png
+                birthday:
+                  type: string
+                  description: MM/DD/YYYY
+                location:
+                  type: string
+            example:
+              name: Mina
+              pronouns: she/they
+              location: Chicago, IL
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  name:
+                    type: string
+                  pronouns:
+                    type: string
+                  age:
+                    type: integer
+                  birthday:
+                    type: string
+                    required: false
+                    description: This is only returned for the current user. MM/DD/YYYY
+                  location:
+                    type: string
+                  joinedAtEpochSeconds:
+                    type: integer
+                    format: int64
+                  totalPosts:
+                    type: integer
+                    format: int64
+              example:
+                username: "minathecat"
+                name: "Mina"
+                pronouns: "she/her"
+                age: 5
+                location: "Chicago, IL"
+                joinedAtEpochSeconds: 1736971200
+                totalPosts: 20
+
+  /users/{username}/photo:
+    parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+    get:
+      summary: "Get user profile photo"
+      tags:
+        - users
+      security:
+        - accessToken: []
+      responses:
+        200:
+          description: "Successful"
+          content:
+            image/png:
+              type: string
+              format: binary
+    post:
+      summary: "Update user profile photo"
+      tags:
+        - users
+      security:
+        - accessToken: []
+      requestBody:
+        required: true
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+      responses:
+        204:
+          description: "Successful"
+    delete:
+      summary: "Delete user profile photo"
+      tags:
+        - users
+      security:
+        - accessToken: []
+      responses:
+        204:
+          description: "Successful"
+
   /users/{username}/posts:
     get:
       summary: "Get users posts"
+      tags:
+        - users
+      security:
+        - accessToken: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: true
+          description: The max number of posts to return
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            maximum: 100
+        - name: cursor
+          in: query
+          required: false
+          description: |
+            The first `limit` posts are returned sorted by newest first. Start at the post with ID `cursor`.
+            Note that post IDs are auto incrementing chronologically. Start at the newest post if omitted.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: "Successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                    nextCursor:
+                      type: integer
+                      format: int64
+              example:
+                posts:
+                  - postId: 15
+                    username: minathecat
+                    body: "miaaaoo!"
+                    distanceKm: 0.2
+                    totalThumbsUp: 23
+                    totalThumbsDown: 0
+                    totalComments: 1
+                    createdAtEpochSeconds: 1740752040
+                    viewerReactions:
+                      - reactionId: 6732
+                        type: like
+                  - postId: 14
+                    username: minathecat
+                    body: "meow"
+                    distanceKm: 1.4
+                    totalThumbsUp: 102
+                    totalThumbsDown: 3
+                    totalComments: 3
+                    createdAtEpochSeconds: 1740773520
+                    viewerReactions: []
+                nextCursor: 13
+  /settings:
+    get:
+      summary: "Get settings"
+      tags:
+        - settings
+      security:
+        - accessToken: []
+      responses:
+        200:
+          description: "Successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  password:
+                    type: string
+    put:
+      summary: "Update settings"
+      tags:
+        - settings
+      security:
+        - accessToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: "Successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  password:
+                    type: string
 
 components:
   securitySchemes:
@@ -437,6 +873,17 @@ components:
         createdAtEpochSeconds:
           type: integer
           format: int64
+        viewerReactions:
+          type: array
+          items:
+            type: object
+            properties:
+              reactionId:
+                type: integer
+                format: int64
+              type:
+                type: string
+                enum: [like, dislike]
     Comment:
       type: object
       properties:
@@ -460,3 +907,14 @@ components:
         updatedAtEpochSeconds:
           type: integer
           format: int64
+        viewerReactions:
+          type: array
+          items:
+            type: object
+            properties:
+              reactionId:
+                type: integer
+                format: int64
+              type:
+                type: string
+                enum: [like, dislike]
