@@ -187,9 +187,9 @@ paths:
                     totalThumbsDown: 0
                     totalComments: 1
                     createdAtEpochSeconds: 1740752040
-                    viewerReactions:
-                      - reactionId: 365
-                        type: "like"
+                    updatedAtEpochSeconds: 1740752040
+                    myReaction:
+                      type: "like"
                   - postId: 14
                     username: minathecat
                     body: "meow"
@@ -198,9 +198,9 @@ paths:
                     totalThumbsDown: 3
                     totalComments: 3
                     createdAtEpochSeconds: 1740773520
-                    viewerReactions:
-                      - reactionId: 369
-                        type: "dislike"
+                    updatedAtEpochSeconds: 1740773520
+                    myReaction:
+                      type: "dislike"
                 nextCursor: 13
 
   /posts/{postId}:
@@ -233,7 +233,8 @@ paths:
                 totalThumbsDown: 3
                 totalComments: 3
                 createdAtEpochSeconds: 1740773520
-                viewerReactions: []
+                updatedAtEpochSeconds: 1740773520
+                myReaction: null
 
   /posts/{postId}/comments:
     parameters:
@@ -270,9 +271,8 @@ paths:
                     totalDislikes: 23
                     createdAtEpochSeconds: 1741301877
                     updatedAtEpochSeconds: 1741301877
-                    viewerReactions:
-                      - reactionId: 64
-                        type: "like"
+                    myReaction:
+                      type: "like"
                   - commentId: 1235
                     username: francis
                     body: "hey that's mean!"
@@ -280,7 +280,7 @@ paths:
                     totalDislikes: 1
                     createdAtEpochSeconds: 1741301955
                     updatedAtEpochSeconds: 1741302015
-                    viewerReactions: []
+                    myReaction: null
     post:
       summary: "Create a comment"
       tags:
@@ -313,7 +313,7 @@ paths:
                 totalDislikes: 0
                 createdAtEpochSeconds: 1741301877
                 updatedAtEpochSeconds: 1741301877
-                viewerReactions: []
+                myReaction: null
 
   /posts/{postId}/comments/{commentId}:
     parameters:
@@ -370,28 +370,28 @@ paths:
                 totalDislikes: 0
                 createdAtEpochSeconds: 1741301877
                 updatedAtEpochSeconds: 1741301997
-                viewerReactions: []
+                myReaction: null
 
-  /posts/{postId}/comments/{commentId}/reactions:
+  /posts/{postId}/comments/{commentId}/my-reaction:
+    parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
     post:
       summary: "Create a comment reaction"
       tags:
         - comments
       security:
         - accessToken: [ ]
-      parameters:
-        - name: postId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: commentId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
       requestBody:
         required: true
         content:
@@ -405,59 +405,43 @@ paths:
             example:
               type: like
       responses:
+        204:
+          description: "Successful"
+    get:
+      summary: "Get comment reactions"
+      tags:
+        - comments
+      security:
+        - accessToken: [ ]
+      responses:
         200:
           description: "Successful"
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  type:
-                    type: string
-                    enum: [like, dislike]
-                  username:
-                    type: string
-                  reactionId:
-                    type: integer
-                    format: int64
+                $ref: "#/components/schemas/Reaction"
               example:
                 type: like
-                username: "minathecat"
-                reactionId: 175
-
-  /posts/{postId}/comments/{commentId}/reactions/{reactionId}:
     delete:
-      summary: "Delete a comment reaction"
+      summary: "Delete my comment reaction"
       tags:
         - comments
       security:
         - accessToken: [ ]
-      parameters:
-        - name: postId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: commentId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: reactionId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
       responses:
         204:
           description: "Successful"
 
-  /posts/{postId}/reactions:
+  /posts/{postId}/my-reaction:
+    parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
     post:
-      summary: "Create a reaction"
+      summary: "Create a post reaction"
       tags:
         - posts
       security:
@@ -467,58 +451,34 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                type:
-                  type: string
-                  enum: [like, dislike]
+              $ref: "#/components/schemas/Reaction"
+            example:
+              type: like
+      responses:
+        204:
+          description: "Successful"
+
+    get:
+      summary: "Get my post reaction"
+      tags:
+        - posts
+      security:
+        - accessToken: []
       responses:
         200:
           description: "Successful"
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  type:
-                    type: string
-                    enum: [like, dislike]
-                  username:
-                    type: string
-                  reactionId:
-                    type: integer
-                    format: int64
+                $ref: "#/components/schemas/Reaction"
               example:
                 type: like
-                username: "minathecat"
-                reactionId: 175
-
-  /posts/{postId}/reactions/{reactionId}:
     delete:
       summary: "Delete a post reaction"
       tags:
         - posts
       security:
         - accessToken: [ ]
-      parameters:
-        - name: postId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: commentId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: reactionId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
       responses:
         204:
           description: "Successful"
@@ -548,8 +508,13 @@ paths:
                     type: string
                   pronouns:
                     type: string
+                  age:
+                    type: integer
+                    format: int64
+                    description: The user's age. This is derived from their birthday which is kept private.
                   location:
                     type: string
+                    description: The user's city and state/territory. This is derived from their lat/lon which are kept private.
                   joinedAtEpochSeconds:
                     type: integer
                     format: int64
@@ -588,8 +553,12 @@ paths:
                 birthday:
                   type: string
                   description: MM/DD/YYYY
-                location:
-                  type: string
+                latitude:
+                  type: number
+                  format: decimal
+                longitude:
+                  type: number
+                  format: decimal
             example:
               name: Mina
               pronouns: she/they
@@ -732,9 +701,8 @@ paths:
                     totalThumbsDown: 0
                     totalComments: 1
                     createdAtEpochSeconds: 1740752040
-                    viewerReactions:
-                      - reactionId: 6732
-                        type: like
+                    myReaction:
+                      type: "like"
                   - postId: 14
                     username: minathecat
                     body: "meow"
@@ -743,7 +711,8 @@ paths:
                     totalThumbsDown: 3
                     totalComments: 3
                     createdAtEpochSeconds: 1740773520
-                    viewerReactions: []
+                    myReaction:
+                      type: "like"
                 nextCursor: 13
   /settings:
     get:
@@ -764,6 +733,9 @@ paths:
                     type: string
                   password:
                     type: string
+              example:
+                username: "aprilmack"
+                password: "8bsb3iiV8eew9aV"
     put:
       summary: "Update settings"
       tags:
@@ -780,6 +752,10 @@ paths:
                   type: string
                 password:
                   type: string
+            example:
+              username: "aprilmack"
+              password: "8bsb3iiV8eew9aV"
+
       responses:
         200:
           description: "Successful"
@@ -873,17 +849,15 @@ components:
         createdAtEpochSeconds:
           type: integer
           format: int64
-        viewerReactions:
-          type: array
-          items:
-            type: object
-            properties:
-              reactionId:
-                type: integer
-                format: int64
-              type:
-                type: string
-                enum: [like, dislike]
+        updatedAtEpochSeconds:
+          type: integer
+          format: int64
+        myReaction:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [ like, dislike ]
     Comment:
       type: object
       properties:
@@ -907,14 +881,15 @@ components:
         updatedAtEpochSeconds:
           type: integer
           format: int64
-        viewerReactions:
-          type: array
-          items:
-            type: object
-            properties:
-              reactionId:
-                type: integer
-                format: int64
-              type:
-                type: string
-                enum: [like, dislike]
+        myReaction:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [ like, dislike ]
+    Reaction:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [ like, dislike ]
