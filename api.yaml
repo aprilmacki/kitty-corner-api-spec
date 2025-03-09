@@ -483,6 +483,26 @@ paths:
         204:
           description: "Successful"
 
+  /users/{username}/available:
+    get:
+      summary: "Check if username is available"
+      tags:
+        - users
+      parameters:
+        - name: username
+          in: path
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+
   /users/{username}/profile:
     get:
       summary: "Get user profile"
@@ -500,34 +520,12 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                  name:
-                    type: string
-                  pronouns:
-                    type: string
-                  age:
-                    type: integer
-                    format: int64
-                    description: The user's age. This is derived from their birthday which is kept private.
-                  location:
-                    type: string
-                    description: The user's city and state/territory. This is derived from their lat/lon which are kept private.
-                  joinedAtEpochSeconds:
-                    type: integer
-                    format: int64
-                  totalPosts:
-                    type: integer
-                    format: int64
-              example:
-                username: "minathecat"
-                name: "Mina"
-                pronouns: "she/her"
-                location: "Chicago, IL"
-                joinedAtEpochSeconds: 1736971200
-                totalPosts: 20
+                $ref: "#/components/schemas/Profile"
+              examples:
+                me:
+                  $ref: "#/components/examples/Profile/me"
+                mina:
+                  $ref: "#/components/examples/Profile/mina"
     put:
       summary: "Update user profile"
       tags:
@@ -562,42 +560,20 @@ paths:
             example:
               name: Mina
               pronouns: she/they
-              location: Chicago, IL
+              birthday: "01/01/1997"
+              latitude: 41.881832
+              longitude: -87.623177
       responses:
         200:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                  name:
-                    type: string
-                  pronouns:
-                    type: string
-                  age:
-                    type: integer
-                  birthday:
-                    type: string
-                    required: false
-                    description: This is only returned for the current user. MM/DD/YYYY
-                  location:
-                    type: string
-                  joinedAtEpochSeconds:
-                    type: integer
-                    format: int64
-                  totalPosts:
-                    type: integer
-                    format: int64
-              example:
-                username: "minathecat"
-                name: "Mina"
-                pronouns: "she/her"
-                age: 5
-                location: "Chicago, IL"
-                joinedAtEpochSeconds: 1736971200
-                totalPosts: 20
+                $ref: "#/components/schemas/Profile"
+              examples:
+                me:
+                  $ref: "#/components/examples/Profile/me"
+                mina:
+                  $ref: "#/components/examples/Profile/mina"
 
   /users/{username}/photo:
     parameters:
@@ -769,6 +745,23 @@ paths:
                   password:
                     type: string
 
+  /users/{username}/delete-requests:
+    post:
+      summary: "Create request to delete user's account"
+      tags:
+        - users
+      security:
+        - accessToken: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: "Successful"
+
 components:
   securitySchemes:
     accessToken:
@@ -893,3 +886,62 @@ components:
         type:
           type: string
           enum: [ like, dislike ]
+    Profile:
+      type: object
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+        pronouns:
+          type: string
+        age:
+          type: integer
+          format: int64
+          description: The user's age. This is derived from their birthday which is kept private.
+        birthday:
+          type: string
+          description: MM/DD/YYY. This is only returned for the current user.
+        location:
+          type: string
+          description: The user's city and state/territory. This is derived from their lat/lon which are kept private.
+        latitude:
+          type: number
+          format: decimal
+          description: This is only returned for the current user.
+        longitude:
+          type: number
+          format: decimal
+          description: This is only returned for the current user.
+        joinedAtEpochSeconds:
+          type: integer
+          format: int64
+        totalPosts:
+          type: integer
+          format: int64
+  examples:
+    Profile:
+      me:
+        value:
+          username: "aprilmack"
+          name: "April"
+          pronouns: "she/her"
+          age: 27
+          birthday: "01/01/1997"
+          location: "Chicago, IL"
+          latitude: 41.881832
+          longitude: -87.623177
+          joinedAtEpochSeconds: 1736971200
+          totalPosts: 20
+      mina:
+        value:
+          username: "minathecat"
+          name: "Mina"
+          pronouns: "she/her"
+          age: 5
+          birthday: null
+          location: "Chicago, IL"
+          latitude: null
+          longitude: null
+          joinedAtEpochSeconds: 1736971200
+          totalPosts: 20
