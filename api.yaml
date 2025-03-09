@@ -57,6 +57,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenResponse"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Bad Request
+                status: 400
+                detail: Username aprilmack is already in use
+                path: /auth/signup
 
   /auth/signin:
     post:
@@ -84,6 +95,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenResponse"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Bad Request
+                status: 400
+                detail: Field password missing
+                path: /auth/signin
+        403:
+          description: "Incorrect username or password"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Forbidden
+                status: 403
+                detail: Username or password incorrect
+                path: /auth/signin
 
   /auth/signout:
     post:
@@ -95,6 +128,17 @@ paths:
       responses:
         204:
           description: "Successful"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /auth/signout
 
   /auth/refresh:
     post:
@@ -110,6 +154,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenResponse"
+        401:
+          description: "No refresh token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No refresh token provided
+                path: /auth/refresh
+        403:
+          description: "Refresh token no longer valid"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
 
   /posts:
     get:
@@ -202,6 +263,23 @@ paths:
                     myReaction:
                       type: "dislike"
                 nextCursor: 13
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts
 
   /posts/{postId}:
     get:
@@ -235,6 +313,29 @@ paths:
                 createdAtEpochSeconds: 1740773520
                 updatedAtEpochSeconds: 1740773520
                 myReaction: null
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts/{postId}
+        404:
+          description: "Post not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
 
   /posts/{postId}/comments:
     parameters:
@@ -281,6 +382,29 @@ paths:
                     createdAtEpochSeconds: 1741301955
                     updatedAtEpochSeconds: 1741302015
                     myReaction: null
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts/{postId}/comments
+        404:
+          description: "Post not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
     post:
       summary: "Create a comment"
       tags:
@@ -314,6 +438,29 @@ paths:
                 createdAtEpochSeconds: 1741301877
                 updatedAtEpochSeconds: 1741301877
                 myReaction: null
+          400:
+            description: "Bad request"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ProblemDetails"
+          401:
+            description: "No access token provided"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ProblemDetails"
+                example:
+                  title: Unauthorized
+                  status: 401
+                  detail: No access token provided
+                  path: /posts/{postId}/comments
+          404:
+            description: "Post not found"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ProblemDetails"
 
   /posts/{postId}/comments/{commentId}:
     parameters:
@@ -338,6 +485,35 @@ paths:
       responses:
         204:
           description: "Successful"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts/{postId}/comments/{commentId}
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        404:
+          description: "Post or comment not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
     put:
       summary: "Edit a comment"
       tags:
@@ -371,6 +547,35 @@ paths:
                 createdAtEpochSeconds: 1741301877
                 updatedAtEpochSeconds: 1741301997
                 myReaction: null
+          400:
+            description: "Bad request"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ProblemDetails"
+          401:
+            description: "No access token provided"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ProblemDetails"
+                example:
+                  title: Unauthorized
+                  status: 401
+                  detail: No access token provided
+                  path: /posts/{postId}/comments/{commentId}
+          403:
+            description: "Forbidden"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ProblemDetails"
+          404:
+            description: "Post or comment not found"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ProblemDetails"
 
   /posts/{postId}/comments/{commentId}/my-reaction:
     parameters:
@@ -407,6 +612,29 @@ paths:
       responses:
         204:
           description: "Successful"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts/{postId}/comments/{commentId}/my-reaction
+        404:
+          description: "Post or comment not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
     get:
       summary: "Get comment reactions"
       tags:
@@ -422,6 +650,23 @@ paths:
                 $ref: "#/components/schemas/Reaction"
               example:
                 type: like
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts/{postId}/comments/{commentId}/my-reactions
+        404:
+          description: "Post or comment not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
     delete:
       summary: "Delete my comment reaction"
       tags:
@@ -431,6 +676,29 @@ paths:
       responses:
         204:
           description: "Successful"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts/{postId}/comments/{commentId}/my-reactions
+        404:
+          description: "Post or comment not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
 
   /posts/{postId}/my-reaction:
     parameters:
@@ -457,6 +725,29 @@ paths:
       responses:
         204:
           description: "Successful"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts/{postId}/my-reactions
+        404:
+          description: "Post not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
 
     get:
       summary: "Get my post reaction"
@@ -473,6 +764,29 @@ paths:
                 $ref: "#/components/schemas/Reaction"
               example:
                 type: like
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts/{postId}/my-reaction
+        404:
+          description: "Post not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
     delete:
       summary: "Delete a post reaction"
       tags:
@@ -482,6 +796,29 @@ paths:
       responses:
         204:
           description: "Successful"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts/{postId}/my-reaction
+        404:
+          description: "Post not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
 
   /users/{username}/available:
     get:
@@ -526,6 +863,23 @@ paths:
                   $ref: "#/components/examples/Profile/me"
                 mina:
                   $ref: "#/components/examples/Profile/mina"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /users/{username}/profile
+        404:
+          description: "User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
     put:
       summary: "Update user profile"
       tags:
@@ -574,6 +928,35 @@ paths:
                   $ref: "#/components/examples/Profile/me"
                 mina:
                   $ref: "#/components/examples/Profile/mina"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /users/{username}/profile
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        404:
+          description: "User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
 
   /users/{username}/photo:
     parameters:
@@ -595,6 +978,23 @@ paths:
             image/png:
               type: string
               format: binary
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /users/{username}/photo
+        404:
+          description: "User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
     post:
       summary: "Update user profile photo"
       tags:
@@ -611,6 +1011,29 @@ paths:
       responses:
         204:
           description: "Successful"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /users/{username}/photo
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
     delete:
       summary: "Delete user profile photo"
       tags:
@@ -620,6 +1043,29 @@ paths:
       responses:
         204:
           description: "Successful"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /users/{username}/photo
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
 
   /users/{username}/posts:
     get:
@@ -690,6 +1136,29 @@ paths:
                     myReaction:
                       type: "like"
                 nextCursor: 13
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /users/{username}/posts
+        404:
+          description: "User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /settings:
     get:
       summary: "Get settings"
@@ -707,11 +1176,20 @@ paths:
                 properties:
                   email:
                     type: string
-                  password:
-                    type: string
               example:
-                username: "aprilmack"
-                password: "8bsb3iiV8eew9aV"
+                email: "aprilmack@posteo.net"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /settings
+
     put:
       summary: "Update settings"
       tags:
@@ -731,7 +1209,6 @@ paths:
             example:
               username: "aprilmack"
               password: "8bsb3iiV8eew9aV"
-
       responses:
         200:
           description: "Successful"
@@ -744,6 +1221,23 @@ paths:
                     type: string
                   password:
                     type: string
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /settings
 
   /users/{username}/delete-requests:
     post:
@@ -761,6 +1255,23 @@ paths:
       responses:
         204:
           description: "Successful"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /users/{username}/delete-requests
+        403:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
 
 components:
   securitySchemes:
@@ -919,6 +1430,17 @@ components:
         totalPosts:
           type: integer
           format: int64
+    ProblemDetails:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        path:
+          type: string
   examples:
     Profile:
       me:
