@@ -4,7 +4,7 @@ info:
   title: KittyCorner API
   description: This is the KittyCorner API.
 servers:
-  - url: http://example.com/v1
+  - url: https://example.com/api/v1
 
 tags:
   - name: auth
@@ -197,7 +197,7 @@ paths:
             type: integer
             format: int64
             minimum: 18
-        - name: radius
+        - name: distanceKm
           in: query
           required: false
           description: The search radius in kilometers. Radius is infinite if omitted.
@@ -249,8 +249,7 @@ paths:
                     totalComments: 1
                     createdAtEpochSeconds: 1740752040
                     updatedAtEpochSeconds: 1740752040
-                    myReaction:
-                      type: "like"
+                    myReaction: "like"
                   - postId: 14
                     username: minathecat
                     body: "meow"
@@ -260,8 +259,7 @@ paths:
                     totalComments: 3
                     createdAtEpochSeconds: 1740773520
                     updatedAtEpochSeconds: 1740773520
-                    myReaction:
-                      type: "dislike"
+                    myReaction: "dislike"
                 nextCursor: 13
         400:
           description: "Bad request"
@@ -372,8 +370,7 @@ paths:
                     totalDislikes: 23
                     createdAtEpochSeconds: 1741301877
                     updatedAtEpochSeconds: 1741301877
-                    myReaction:
-                      type: "like"
+                    myReaction: "like"
                   - commentId: 1235
                     username: francis
                     body: "hey that's mean!"
@@ -591,8 +588,8 @@ paths:
         schema:
           type: integer
           format: int64
-    post:
-      summary: "Create a comment reaction"
+    put:
+      summary: "Update a comment reaction"
       tags:
         - comments
       security:
@@ -635,70 +632,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
-    get:
-      summary: "Get comment reactions"
-      tags:
-        - comments
-      security:
-        - accessToken: [ ]
-      responses:
-        200:
-          description: "Successful"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Reaction"
-              example:
-                type: like
-        401:
-          description: "No access token provided"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
-              example:
-                title: Unauthorized
-                status: 401
-                detail: No access token provided
-                path: /posts/{postId}/comments/{commentId}/my-reactions
-        404:
-          description: "Post or comment not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
-    delete:
-      summary: "Delete my comment reaction"
-      tags:
-        - comments
-      security:
-        - accessToken: [ ]
-      responses:
-        204:
-          description: "Successful"
-        400:
-          description: "Bad request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
-        401:
-          description: "No access token provided"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
-              example:
-                title: Unauthorized
-                status: 401
-                detail: No access token provided
-                path: /posts/{postId}/comments/{commentId}/my-reactions
-        404:
-          description: "Post or comment not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
 
   /posts/{postId}/my-reaction:
     parameters:
@@ -708,8 +641,8 @@ paths:
         schema:
           type: integer
           format: int64
-    post:
-      summary: "Create a post reaction"
+    put:
+      summary: "Update a post reaction"
       tags:
         - posts
       security:
@@ -742,77 +675,6 @@ paths:
                 status: 401
                 detail: No access token provided
                 path: /posts/{postId}/my-reactions
-        404:
-          description: "Post not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
-
-    get:
-      summary: "Get my post reaction"
-      tags:
-        - posts
-      security:
-        - accessToken: []
-      responses:
-        200:
-          description: "Successful"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Reaction"
-              example:
-                type: like
-        400:
-          description: "Bad request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
-        401:
-          description: "No access token provided"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
-              example:
-                title: Unauthorized
-                status: 401
-                detail: No access token provided
-                path: /posts/{postId}/my-reaction
-        404:
-          description: "Post not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
-    delete:
-      summary: "Delete a post reaction"
-      tags:
-        - posts
-      security:
-        - accessToken: [ ]
-      responses:
-        204:
-          description: "Successful"
-        400:
-          description: "Bad request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
-        401:
-          description: "No access token provided"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
-              example:
-                title: Unauthorized
-                status: 401
-                detail: No access token provided
-                path: /posts/{postId}/my-reaction
         404:
           description: "Post not found"
           content:
@@ -1386,11 +1248,8 @@ components:
           type: integer
           format: int64
         myReaction:
-          type: object
-          properties:
-            type:
-              type: string
-              enum: [ like, dislike ]
+          type: string
+          enum: [ like, dislike ]
     Reaction:
       type: object
       properties:
