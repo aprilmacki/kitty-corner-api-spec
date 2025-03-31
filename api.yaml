@@ -278,6 +278,45 @@ paths:
                 status: 401
                 detail: No access token provided
                 path: /posts
+    post:
+      summary: "Create post"
+      tags:
+        - posts
+      security:
+        - accessToken: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+      responses:
+        200:
+          description: "Successful"
+          content:
+            application.json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts
 
   /posts/{postId}:
     get:
@@ -328,6 +367,112 @@ paths:
                 status: 401
                 detail: No access token provided
                 path: /posts/{postId}
+        404:
+          description: "Post not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+    delete:
+      summary: "Delete post"
+      tags:
+        - posts
+      security:
+        - accessToken: [ ]
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        204:
+          description: "Successful"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts/{postId}
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        404:
+          description: "Post not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+    put:
+      summary: "Update post"
+      tags:
+        - posts
+      security:
+        - accessToken: [ ]
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                  required: false
+      responses:
+        200:
+          description: "Successful"
+          content:
+            application.json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        401:
+          description: "No access token provided"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              example:
+                title: Unauthorized
+                status: 401
+                detail: No access token provided
+                path: /posts
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
         404:
           description: "Post not found"
           content:
@@ -1021,6 +1166,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+
   /settings:
     get:
       summary: "Get settings"
